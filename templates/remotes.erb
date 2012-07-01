@@ -1,0 +1,7 @@
+<% remotes.each |server| -%>
+  <% if server['host'] && server['user'] && server['password'] -%>
+    <% protocol = server['protocol'] ? server['protocol'] : 'smtp' -%>
+    <% port     = server['port'] ? server['port'] : '25' -%>
+<%= server['host'] -%> <%= protocol -%> --port=<%= port -%> --auth-login --user=<%= server['user'] -%> --pass=<%= server['password'] %>
+  <% end -%>
+<% end -%>
