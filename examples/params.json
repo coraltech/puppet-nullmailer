@@ -1,0 +1,5 @@
+{
+  "nullmailer_package_ensure" : "present",
+  "nullmailer_package_ensure" : "present",
+  "nullmailer_remotes" : []
+}

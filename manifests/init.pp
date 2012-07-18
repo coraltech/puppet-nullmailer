@@ -2,15 +2,13 @@
 #
 #   This module manages the NullMailer MTA service.
 #
-#   Adrian Webb <adrian.webb@coraltg.com>
+#   Adrian Webb <adrian.webb@coraltech.net>
 #   2012-05-22
 #
 #   Tested platforms:
 #    - Ubuntu 12.04
 #
-# Parameters:
-#
-#  $nullmailer_version = $nullmailer::params::nullmailer_version
+# Parameters: (see <examples/params.json> for Hiera configurations)
 #
 # Actions:
 #
@@ -35,47 +33,49 @@
 # [Remember: No empty lines between comments and class definition]
 class nullmailer (
 
-  $remotes            = [],
-  $nullmailer_package = $nullmailer::params::nullmailer_package,
-  $nullmailer_version = $nullmailer::params::nullmailer_version,
-  $config_path        = $nullmailer::params::config_path,
-  $remotes_path       = $nullmailer::params::remotes_path,
+  $package          = $nullmailer::params::os_nullmailer_package,
+  $package_ensure   = $nullmailer::params::nullmailer_package_ensure,
+  $service          = $nullmailer::params::os_nullmailer_service,
+  $service_ensure   = $nullmailer::params::nullmailer_service_ensure,
+  $remotes_dir      = $nullmailer::params::os_remotes_dir,
+  $remotes          = $nullmailer::params::remotes,
+  $remotes_template = $nullmailer::params::os_remotes_template,
 
 ) inherits nullmailer::params {
 
   #-----------------------------------------------------------------------------
-  # Install
+  # Installation
 
-  if ! $nullmailer::params::nullmailer_package or ! $nullmailer_version {
+  if ! $package or ! $package_ensure {
     fail('Nullmailer package and version must be defined')
   }
-  package { $nullmailer::params::nullmailer_package:
-    ensure => $nullmailer_version,
+  package { 'nullmailer':
+    name   => $package,
+    ensure => $package_ensure,
   }
 
   #-----------------------------------------------------------------------------
-  # Configure
+  # Configuration
 
-  if $remotes_path {
-    file { $remotes_path:
+  if $remotes_dir {
+    file { 'nullmailer-remotes':
+      path     => $remotes_dir,
       owner    => "mail",
       group    => "mail",
       mode     => 600,
-      content  => template('nullmailer/remotes.erb'),
+      content  => template($remotes_template),
+      require  => Package['nullmailer'],
       notify   => Service['nullmailer'],
     }
   }
 
   #-----------------------------------------------------------------------------
-  # Manage
+  # Services
 
-  service {
-    'nullmailer':
-      enable    => true,
-      ensure    => ! $remotes_path or empty($remotes) ? {
-        true    => 'stopped',
-        default => 'running',
-      },
-      subscribe => Package['nullmailer'],
+  service { 'nullmailer':
+    name    => $service,
+    ensure  => $service_ensure,
+    enable  => true,
+    require => Package['nullmailer'],
   }
 }
