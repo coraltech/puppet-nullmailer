@@ -6,7 +6,7 @@ class nullmailer::params {
   #-----------------------------------------------------------------------------
   # General configurations
 
-  if $::hiera_exists {
+  if $::hiera_ready {
     $nullmailer_package_ensure = hiera('nullmailer_package_ensure', $nullmailer::default::nullmailer_package_ensure)
     $nullmailer_service_ensure = hiera('nullmailer_service_ensure', $nullmailer::default::nullmailer_service_ensure)
     $remotes                   = hiera('nullmailer_remotes', $nullmailer::default::remotes)
