@@ -33,13 +33,13 @@
 # [Remember: No empty lines between comments and class definition]
 class nullmailer (
 
-  $package          = $nullmailer::params::os_nullmailer_package,
-  $package_ensure   = $nullmailer::params::nullmailer_package_ensure,
-  $service          = $nullmailer::params::os_nullmailer_service,
-  $service_ensure   = $nullmailer::params::nullmailer_service_ensure,
-  $remotes_dir      = $nullmailer::params::os_remotes_dir,
+  $package          = $nullmailer::params::package,
+  $package_ensure   = $nullmailer::params::package_ensure,
+  $service          = $nullmailer::params::service,
+  $service_ensure   = $nullmailer::params::service_ensure,
+  $remotes_dir      = $nullmailer::params::remotes_dir,
+  $remotes_template = $nullmailer::params::remotes_template,
   $remotes          = $nullmailer::params::remotes,
-  $remotes_template = $nullmailer::params::os_remotes_template,
 
 ) inherits nullmailer::params {
 
@@ -60,9 +60,9 @@ class nullmailer (
   if $remotes_dir {
     file { 'nullmailer-remotes':
       path     => $remotes_dir,
-      owner    => "mail",
-      group    => "mail",
-      mode     => 600,
+      owner    => 'mail',
+      group    => 'root',
+      mode     => '0660',
       content  => template($remotes_template),
       require  => Package['nullmailer'],
       notify   => Service['nullmailer'],
